@@ -1,0 +1,57 @@
+import argparse
+import os
+import sys
+import shutil
+import argparse
+import gzip
+import glob
+import re
+
+
+sim=glob.glob("*sim*")
+hapall = glob.glob("*hapall*")
+sim.sort()
+hapall.sort()
+prefixes=[re.sub(r'.sim.vcf', '', files) for files in sim]
+prefixes.sort()
+
+for (sims,haps) in zip(sim,hapall):
+	os.system(r' bgzip %s' % (sims))
+	os.system(r' bgzip %s' % (haps))
+
+sim=glob.glob("*sim.vcf.gz")
+hapall = glob.glob("*hapall.vcf.gz")
+gen=glob.glob("*genie.vcf.gz")
+
+
+sim.sort()
+hapall.sort()
+gen.sort()
+prefixes=[re.sub(r'.sim.vcf.gz', '', sims) for sims in sim]
+prefixes.sort()
+
+for (sims,haps,gens,prefix) in zip(sim,hapall,gen,prefixes):
+	os.system(r' bcftools isec -p %s %s %s %s -n +3' % (prefix, sims, haps, gens))
+
+for (sims,haps,gens) in zip(sim,hapall,gen):
+	os.system(r' bcftools index %s' % (sims))
+	os.system(r' bcftools index %s' % (haps))
+	os.system(r' bcftools index %s' % (haps))
+
+
+
+
+
+file = open("vcf_list.txt", "a")
+file.write("List of files \n") 	
+for (sims,haps,prefix) in zip (sim,hapall,prefixes):
+		listToStr1 = ''.join(map(str, sims))	
+		listToStr2 = ''.join(map(str, haps))
+		listToStr3 = ''.join(map(str, prefix))
+		file.write(" sims \n %s \n hapall \n %s \n prefix \n %s \n------------------- \n" % (listToStr1,listToStr2,listToStr3))
+		file.close
+		os.system(r' bcftools stats %s %s > %s_stats.txt ' % (sims, haps, prefix))
+
+for vcf in *.vcf.gz; do name=$(echo $vcf | sed 's/[._.].*//'); for sim in *sim*; do sims=$(echo $sim); for hap in *hapall*; do haps=$(echo $hap); for gen in *genie*; do gens=$(echo $gen); bcftools isec -p "$name" "$sim" "$hap" "$gen" -n 1+; done
+
+for vcf in *.vcf.gz; do name=$(echo $vcf | sed 's/[._.].*//'); bcftools isec -p "$name".sim.gz "$name"_filtered_hapall.vcf.gz "$name"_genie.vcf.gz -n 1; done
