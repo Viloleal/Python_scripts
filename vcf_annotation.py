@@ -20,7 +20,7 @@ for (files,prefix) in zip (vcfs,prefixes):
 	file = open("vcfs_prefixes.txt", "a")
 	file.write("List of files \n vcfs \n %s \n Prefix \n %s \n ------------------- \n" % (listToStr1,listToStr2))
 	file.close()
-	subprocess.call(['bash', '-c', ' ~/bin/snpEff_latest_core/snpEff/scripts/snpEff -v Mycobacterium_bovis_af2122_NC002945.4 %s -ud 0 >> %s_ann.vcf' % (files, prefix)])
+	subprocess.call(['bash', '-c', ' ~/bin/snpEff_latest_core/snpEff/scripts/snpEff -v Mycobacterium_bovis_af2122_latest %s -ud 0 >> %s_ann.vcf' % (files, prefix)])
 path = os.getcwd()
 ann_dir = os.path.join(path, r'Annotations')
 os.mkdir(ann_dir)
